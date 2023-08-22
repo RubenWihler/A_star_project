@@ -1,0 +1,17 @@
+C:\Users\Admin\Documents\GitHub\A_star_project\AStarProject\bin\Debug\net6.0-windows\AStarProject.exe
+C:\Users\Admin\Documents\GitHub\A_star_project\AStarProject\bin\Debug\net6.0-windows\AStarProject.deps.json
+C:\Users\Admin\Documents\GitHub\A_star_project\AStarProject\bin\Debug\net6.0-windows\AStarProject.runtimeconfig.json
+C:\Users\Admin\Documents\GitHub\A_star_project\AStarProject\bin\Debug\net6.0-windows\AStarProject.dll
+C:\Users\Admin\Documents\GitHub\A_star_project\AStarProject\bin\Debug\net6.0-windows\AStarProject.pdb
+C:\Users\Admin\Documents\GitHub\A_star_project\AStarProject\obj\Debug\net6.0-windows\AStarProject.csproj.AssemblyReference.cache
+C:\Users\Admin\Documents\GitHub\A_star_project\AStarProject\obj\Debug\net6.0-windows\AStarProject.Form1.resources
+C:\Users\Admin\Documents\GitHub\A_star_project\AStarProject\obj\Debug\net6.0-windows\AStarProject.csproj.GenerateResource.cache
+C:\Users\Admin\Documents\GitHub\A_star_project\AStarProject\obj\Debug\net6.0-windows\AStarProject.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Admin\Documents\GitHub\A_star_project\AStarProject\obj\Debug\net6.0-windows\AStarProject.AssemblyInfoInputs.cache
+C:\Users\Admin\Documents\GitHub\A_star_project\AStarProject\obj\Debug\net6.0-windows\AStarProject.AssemblyInfo.cs
+C:\Users\Admin\Documents\GitHub\A_star_project\AStarProject\obj\Debug\net6.0-windows\AStarProject.csproj.CoreCompileInputs.cache
+C:\Users\Admin\Documents\GitHub\A_star_project\AStarProject\obj\Debug\net6.0-windows\AStarProject.dll
+C:\Users\Admin\Documents\GitHub\A_star_project\AStarProject\obj\Debug\net6.0-windows\refint\AStarProject.dll
+C:\Users\Admin\Documents\GitHub\A_star_project\AStarProject\obj\Debug\net6.0-windows\AStarProject.pdb
+C:\Users\Admin\Documents\GitHub\A_star_project\AStarProject\obj\Debug\net6.0-windows\AStarProject.genruntimeconfig.cache
+C:\Users\Admin\Documents\GitHub\A_star_project\AStarProject\obj\Debug\net6.0-windows\ref\AStarProject.dll

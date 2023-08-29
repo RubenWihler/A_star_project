@@ -7,14 +7,16 @@ namespace AStarProject
         Empty,
         Wall,
         Start,
-        End
+        End,
+        Path,
+        Calculated
     }
 
     public partial class Form1 : Form
     {
         const int GRID_SIZE_X = 30;
         const int GRID_SIZE_Y = 30;
-        const int TILE_SIZE = 35;
+        const int TILE_SIZE = 100;
 
         public Tile? StartTile { get; set; } = null;
         public Tile? EndTile { get; set; } = null;
@@ -81,13 +83,12 @@ namespace AStarProject
             {
                 for (int x = 0; x < sizeX; x++)
                 {
-                    Tile tile = new Tile(){
+                    Tile tile = new Tile(id, x, y, this){
                         Size = new Size(tileSize, tileSize),
                         Location = new Point(x * tileSize, y * tileSize),
                         Tag = new Point(x, y)
                     };
 
-                    tile.Init(this, id);
                     Tiles.Add(id, tile);
                     this.tiles_container.Controls.Add(tile);
                     id++;
@@ -122,7 +123,8 @@ namespace AStarProject
 
         public void Start()
         {
-
+            var operation = new AstarCalculation(Tiles, StartTile, EndTile);
+            operation.Calculate();
         }
 
         #endregion

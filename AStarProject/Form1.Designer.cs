@@ -28,65 +28,87 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.tiles_container = new System.Windows.Forms.Panel();
-            this.navigation = new System.Windows.Forms.Panel();
-            this.btn_start = new System.Windows.Forms.Button();
-            this.btn_reset = new System.Windows.Forms.Button();
-            this.navigation.SuspendLayout();
-            this.SuspendLayout();
+            tiles_container = new Panel();
+            navigation = new Panel();
+            btn_zoom_in = new Button();
+            btn_zoom_out = new Button();
+            btn_reset = new Button();
+            btn_start = new Button();
+            navigation.SuspendLayout();
+            SuspendLayout();
             // 
             // tiles_container
             // 
-            this.tiles_container.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tiles_container.AutoScroll = true;
-            this.tiles_container.Location = new System.Drawing.Point(12, 102);
-            this.tiles_container.Name = "tiles_container";
-            this.tiles_container.Size = new System.Drawing.Size(1055, 797);
-            this.tiles_container.TabIndex = 0;
+            tiles_container.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            tiles_container.AutoScroll = true;
+            tiles_container.Location = new Point(12, 102);
+            tiles_container.Name = "tiles_container";
+            tiles_container.Size = new Size(1055, 797);
+            tiles_container.TabIndex = 0;
             // 
             // navigation
             // 
-            this.navigation.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.navigation.Controls.Add(this.btn_reset);
-            this.navigation.Controls.Add(this.btn_start);
-            this.navigation.Location = new System.Drawing.Point(12, 12);
-            this.navigation.Name = "navigation";
-            this.navigation.Size = new System.Drawing.Size(1055, 82);
-            this.navigation.TabIndex = 1;
+            navigation.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            navigation.Controls.Add(btn_zoom_in);
+            navigation.Controls.Add(btn_zoom_out);
+            navigation.Controls.Add(btn_reset);
+            navigation.Controls.Add(btn_start);
+            navigation.Location = new Point(12, 12);
+            navigation.Name = "navigation";
+            navigation.Size = new Size(1055, 82);
+            navigation.TabIndex = 1;
             // 
-            // btn_start
+            // btn_zoom_in
             // 
-            this.btn_start.Location = new System.Drawing.Point(21, 22);
-            this.btn_start.Name = "btn_start";
-            this.btn_start.Size = new System.Drawing.Size(157, 44);
-            this.btn_start.TabIndex = 0;
-            this.btn_start.Text = "Start";
-            this.btn_start.UseVisualStyleBackColor = true;
+            btn_zoom_in.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btn_zoom_in.Font = new Font("Segoe UI", 11F, FontStyle.Regular, GraphicsUnit.Point);
+            btn_zoom_in.Location = new Point(936, 22);
+            btn_zoom_in.Name = "btn_zoom_in";
+            btn_zoom_in.Size = new Size(50, 44);
+            btn_zoom_in.TabIndex = 3;
+            btn_zoom_in.Text = "+";
+            btn_zoom_in.UseVisualStyleBackColor = true;
+            // 
+            // btn_zoom_out
+            // 
+            btn_zoom_out.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btn_zoom_out.Font = new Font("Segoe UI", 11F, FontStyle.Regular, GraphicsUnit.Point);
+            btn_zoom_out.Location = new Point(992, 22);
+            btn_zoom_out.Name = "btn_zoom_out";
+            btn_zoom_out.Size = new Size(50, 44);
+            btn_zoom_out.TabIndex = 2;
+            btn_zoom_out.Text = "-";
+            btn_zoom_out.UseVisualStyleBackColor = true;
             // 
             // btn_reset
             // 
-            this.btn_reset.Location = new System.Drawing.Point(193, 22);
-            this.btn_reset.Name = "btn_reset";
-            this.btn_reset.Size = new System.Drawing.Size(157, 44);
-            this.btn_reset.TabIndex = 1;
-            this.btn_reset.Text = "Reset";
-            this.btn_reset.UseVisualStyleBackColor = true;
+            btn_reset.Location = new Point(193, 22);
+            btn_reset.Name = "btn_reset";
+            btn_reset.Size = new Size(157, 44);
+            btn_reset.TabIndex = 1;
+            btn_reset.Text = "Reset";
+            btn_reset.UseVisualStyleBackColor = true;
+            // 
+            // btn_start
+            // 
+            btn_start.Location = new Point(21, 22);
+            btn_start.Name = "btn_start";
+            btn_start.Size = new Size(157, 44);
+            btn_start.TabIndex = 0;
+            btn_start.Text = "Start";
+            btn_start.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1079, 911);
-            this.Controls.Add(this.navigation);
-            this.Controls.Add(this.tiles_container);
-            this.Name = "Form1";
-            this.Text = "Form1";
-            this.navigation.ResumeLayout(false);
-            this.ResumeLayout(false);
-
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(1079, 911);
+            Controls.Add(navigation);
+            Controls.Add(tiles_container);
+            Name = "Form1";
+            Text = "Form1";
+            navigation.ResumeLayout(false);
+            ResumeLayout(false);
         }
 
         #endregion
@@ -95,5 +117,7 @@
         private Panel navigation;
         private Button btn_start;
         private Button btn_reset;
+        private Button btn_zoom_in;
+        private Button btn_zoom_out;
     }
 }

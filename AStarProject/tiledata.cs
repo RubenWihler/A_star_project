@@ -1,5 +1,3 @@
-using System.Drawing.Text;
-using System.Linq;
 using AStarProject;
 using AStarProject.Controls;
 
@@ -9,25 +7,26 @@ internal readonly struct TileData
     public readonly int _h_cost;
     public readonly int _f_cost;
     public readonly int _tile_id;
-    public readonly int _tile_x;
-    public readonly int _tile_y;
     public readonly int _parent_id;
-    public readonly int _parent_x;
-    public readonly int _parent_y;
-    public readonly bool _has_been_visited;
 
-    public TileData(int g_cost, int h_cost, int f_cost, int tile_id, int tile_x, int tile_y, int parent_id, int parent_x, int parent_y, bool has_been_visited = false)
+    public TileData(int g_cost, int h_cost, int f_cost, int tile_id, int parent_id)
     {
         _g_cost = g_cost;
         _h_cost = h_cost;
         _f_cost = f_cost;
         _tile_id = tile_id;
-        _tile_x = tile_x;
-        _tile_y = tile_y;
         _parent_id = parent_id;
-        _parent_x = parent_x;
-        _parent_y = parent_y;
-        _has_been_visited = has_been_visited;
+    }
+}
+
+public readonly struct AStarOperationResult{
+    public readonly bool success;
+    public readonly Tile[] path;
+
+    public AStarOperationResult(bool success, Tile[] path)
+    {
+        this.success = success;
+        this.path = path;
     }
 }
 
@@ -46,67 +45,79 @@ public class AstarCalculation{
         this._tiles_data = new Dictionary<int, TileData>();
     }
 
-    public void Calculate(){
-        Tile[] tiles = _tiles.Values.ToArray();
-        Tile currentTile = _startTile;
-        
-        //calculer la tile de depart
+    public void CalculateSync()
+    {
+        var tiles_arr = _tiles.Values.ToArray();
+        var open = new List<Tile>();
+        var closed = new List<Tile>();
+        var open_data = new List<TileData>();
+        var currentTile = _startTile;
+
+        //ajouter la tile de depart dans open
         var start_tile_data = CreateStartData(currentTile);
+        open_data.Add(start_tile_data);
+        open.Add(currentTile);
+        _tiles_data.Add(start_tile_data._tile_id, start_tile_data);
 
         while (!_hasFounded)
         {
-            //chercher les voisins de la tile courante
-            var neighbours = FindNeighbourOf(currentTile, tiles);
+            //trouver la tile avec le plus petit fCost
+            var current_tile_data = FindLowestFCostTileData(open_data);
+            var current_tile = _tiles[current_tile_data._tile_id];
 
-            //calculer les tiles voisines de la tile courante
+            //enlever la tile de open et l'ajouter dans closed
+            open.Remove(current_tile);
+            open_data.Remove(current_tile_data);
+            closed.Add(current_tile);
+
+            //si la tile est la tile de fin, on arrete la boucle
+            if (current_tile == _endTile)
+            {
+                _hasFounded = true;
+                break;
+            }
+
+            //trouver les voisins de la tile
+            var neighbours = FindNeighbourOf(current_tile, tiles_arr);
+
             foreach (var n in neighbours)
             {
-                //si la tile est un mur on ne la calcule pas
+                //si la tile est un mur, on l'ignore
                 if (n.Type == TileType.Wall) continue;
+                //si la tile est dans closed, on l'ignore
+                if (closed.Contains(n)) continue;
 
-                //la tile qui va devenir parent des tiles voisines
-                Tile parent_tile = currentTile;
-                
-                //si la tile a deja ete calculee on la recalcule avec les nouvelles donnees
-                if (_tiles_data.ContainsKey(n.Id)){
-                    var old_data = _tiles_data[n.Id];
-                    var new_data = TileDataFrom(n, parent_tile, _tiles_data[parent_tile.Id], old_data);
-                    _tiles_data[n.Id] = new_data;   
-                }
-                else{
-                    //sinon on la calcule normalement
-                    var data = TileDataFrom(n, parent_tile, _tiles_data[parent_tile.Id]);
+                //calculer le gCost de la tile
+                int g_cost = CalculateGCost(n.position, current_tile.position, current_tile_data._g_cost);
+
+                //si la tile n'est pas dans open, on cree un nouveau TileData et on l'ajoute dans open 
+                if (!open.Contains(n)){
+                    var data = CreateTDataFrom(n.Id, current_tile.Id, g_cost, CalculateHCost(n.position));
+
+                    //ajouter la tile dans open
+                    open.Add(n);
+                    open_data.Add(data);
                     _tiles_data.Add(n.Id, data);
+                }
+                //si il est deja dans open, on verifie si le gCost est plus petit que le gCost de la tile data deja existante
+                else if (g_cost < _tiles_data[n.Id]._g_cost){
+                    var old_data = _tiles_data[n.Id];
+                    var data = CreateTDataFrom(n.Id, current_tile.Id, g_cost, old_data._h_cost);
+                    
+                    //remplacer l'ancienne tile data par la nouvelle
+                    open_data.Remove(old_data);
+                    open_data.Add(data);
+                    _tiles_data[n.Id] = data;
                 }
             }
 
-
-
-            //marquer la tile courante comme visitee
-            var current_tile_data = _tiles_data[currentTile.Id];
-            _tiles_data[currentTile.Id] = VisiteTile(current_tile_data);
-
-            
-
-            //recuperer les tiles visitees (et donc calculees)
-            var calculed_tiles_datas = _tiles_data.Values.ToArray();
-            var visited_tile_datas = from t in calculed_tiles_datas
-                                     where t._has_been_visited
-                                     select t;
-
-            //definir la nouvelle tile courante qui sera la tile avec le plus petit fCost
-            var new_current_tile_data = FindLowestFCostTileData(visited_tile_datas.ToArray());
-            currentTile = _tiles[new_current_tile_data._tile_id];
-
-            //si la tile courante est la tile de fin, on a fini
-            if (currentTile == _endTile) _hasFounded = true;
         }
 
         //reconstruire le chemin
         var path = new List<Tile>();
         var current_path_tile_data = _tiles_data[_endTile.Id];
 
-        while(current_path_tile_data._tile_id != _startTile.Id)
+        while (current_path_tile_data._tile_id != _startTile.Id)
         {
             path.Add(_tiles[current_path_tile_data._tile_id]);
             current_path_tile_data = _tiles_data[current_path_tile_data._parent_id];
@@ -116,9 +127,94 @@ public class AstarCalculation{
 
         //afficher le chemin
         path.ForEach(t => t.Type = TileType.Path);
-
     }
 
+    public async Task<AStarOperationResult> CalculateAsync()
+    {
+        return await Task.Run(() => CalculateResult());
+    }
+    private AStarOperationResult CalculateResult()
+    {
+        var tiles_arr = _tiles.Values.ToArray();
+        var open = new List<Tile>();
+        var closed = new List<Tile>();
+        var open_data = new List<TileData>();
+        var currentTile = _startTile;
+
+        //ajouter la tile de depart dans open
+        var start_tile_data = CreateStartData(currentTile);
+        open_data.Add(start_tile_data);
+        open.Add(currentTile);
+        _tiles_data.Add(start_tile_data._tile_id, start_tile_data);
+
+        while (!_hasFounded)
+        {
+            //trouver la tile avec le plus petit fCost
+            var current_tile_data = FindLowestFCostTileData(open_data);
+            var current_tile = _tiles[current_tile_data._tile_id];
+
+            //enlever la tile de open et l'ajouter dans closed
+            open.Remove(current_tile);
+            open_data.Remove(current_tile_data);
+            closed.Add(current_tile);
+
+            //si la tile est la tile de fin, on arrete la boucle
+            if (current_tile == _endTile)
+            {
+                _hasFounded = true;
+                break;
+            }
+
+            //trouver les voisins de la tile
+            var neighbours = FindNeighbourOf(current_tile, tiles_arr);
+
+            foreach (var n in neighbours)
+            {
+                //si la tile est un mur, on l'ignore
+                if (n.Type == TileType.Wall) continue;
+                //si la tile est dans closed, on l'ignore
+                if (closed.Contains(n)) continue;
+
+                //calculer le gCost de la tile
+                int g_cost = CalculateGCost(n.position, current_tile.position, current_tile_data._g_cost);
+
+                //si la tile n'est pas dans open, on cree un nouveau TileData et on l'ajoute dans open 
+                if (!open.Contains(n)){
+                    var data = CreateTDataFrom(n.Id, current_tile.Id, g_cost, CalculateHCost(n.position));
+
+                    //ajouter la tile dans open
+                    open.Add(n);
+                    open_data.Add(data);
+                    _tiles_data.Add(n.Id, data);
+                }
+                //si il est deja dans open, on verifie si le gCost est plus petit que le gCost de la tile data deja existante
+                else if (g_cost < _tiles_data[n.Id]._g_cost){
+                    var old_data = _tiles_data[n.Id];
+                    var data = CreateTDataFrom(n.Id, current_tile.Id, g_cost, old_data._h_cost);
+                    
+                    //remplacer l'ancienne tile data par la nouvelle
+                    open_data.Remove(old_data);
+                    open_data.Add(data);
+                    _tiles_data[n.Id] = data;
+                }
+            }
+
+        }
+
+        //reconstruire le chemin
+        var path = new List<Tile>();
+        var current_path_tile_data = _tiles_data[_endTile.Id];
+
+        while (current_path_tile_data._tile_id != _startTile.Id)
+        {
+            path.Add(_tiles[current_path_tile_data._tile_id]);
+            current_path_tile_data = _tiles_data[current_path_tile_data._parent_id];
+        }
+
+        path.Reverse();
+
+        return new AStarOperationResult(true, path.ToArray());
+    }
 
     private int CalculateHCost(Point tilePosition)
     {
@@ -129,6 +225,7 @@ public class AstarCalculation{
     }
     private int CalculateGCost(Point tilePosition, Point parentPosition, int parentGCost)
     {
+        //si la tile est sur la meme ligne ou colonne que la tile parente, on ajoute 10 au gCost, sinon on ajoute 14
         var to_add = tilePosition.X == parentPosition.X || tilePosition.Y == parentPosition.Y ? 10 : 14;
         return parentGCost + to_add;
     }
@@ -160,54 +257,10 @@ public class AstarCalculation{
             h_cost,
             CalculateFCost(0, h_cost),
             tile.Id,
-            tile.position.X,
-            tile.position.Y,
-            -1,
-            -1,
             -1
         );
     }
-    private TileData TileDataFrom(Tile tile, Tile parentTile, TileData parentTileData)
-    {
-        var h_cost = CalculateHCost(tile.position);
-        var g_cost = CalculateGCost(tile.position, parentTile.position, parentTileData._g_cost);
-        var f_cost = CalculateFCost(g_cost, h_cost);
-
-        return new TileData(
-            g_cost,
-            h_cost,
-            f_cost,
-            tile.Id,
-            tile.position.X,
-            tile.position.Y,
-            parentTile.Id,
-            parentTile.position.X,
-            parentTile.position.Y,
-            false
-        );
-    }
-    private TileData TileDataFrom(Tile tile, Tile parentTile, TileData parentTileData, TileData oldData)
-    {
-        var g_cost = CalculateGCost(tile.position, parentTile.position, parentTileData._g_cost);
-
-        // ne pas modifier les données si le gCost est supérieur à l'ancien
-        if (g_cost >= oldData._g_cost) return oldData;
-
-        return new TileData(
-            g_cost,
-            oldData._h_cost,
-            CalculateFCost(g_cost, oldData._h_cost),
-            oldData._tile_id,
-            oldData._tile_x,
-            oldData._tile_y,
-            parentTile.Id,
-            parentTile.position.X,
-            parentTile.position.Y,
-            oldData._has_been_visited
-        );
-    }
-
-    private TileData FindLowestFCostTileData(in TileData[] tileDatas)
+    private TileData FindLowestFCostTileData(List<TileData> tileDatas)
     {
         var lowestFCost = tileDatas.Min(t => t._f_cost);
         var lowest_f_cost_tiles = tileDatas.Where(t => t._f_cost == lowestFCost).ToArray();
@@ -215,24 +268,14 @@ public class AstarCalculation{
         var lowestHCost = lowest_f_cost_tiles.Min(t => t._h_cost);
         return lowest_f_cost_tiles.First(t => t._h_cost == lowestHCost);
     }
-
-    private TileData VisiteTile(in TileData tileData)
+    private TileData CreateTDataFrom(int tileId, int parentId, int gCost, int hCost)
     {
         return new TileData(
-            tileData._g_cost,
-            tileData._h_cost,
-            tileData._f_cost,
-            tileData._tile_id,
-            tileData._tile_x,
-            tileData._tile_y,
-            tileData._parent_id,
-            tileData._parent_x,
-            tileData._parent_y,
-            true
+            gCost,
+            hCost,
+            CalculateFCost(gCost, hCost),
+            tileId,
+            parentId
         );
     }
-
-
-
 }
-

@@ -5,6 +5,7 @@
         public readonly Point position;
         private Form1 _form;
         private TileType _type = TileType.Empty;
+        private TileInfosMode _tile_infos_mode = TileInfosMode.None;
         
         public TileType Type
         {
@@ -20,21 +21,21 @@
                         this.BackColor = Color.White;
                         break;
                     case TileType.Wall:
-                        this.BackColor = Color.FromArgb(0x44, 0x44, 0x44);
+                        this.BackColor = Color.FromArgb(0x7c, 0x7c, 0x7c);
                         break;
                     case TileType.Start:
-                        this.BackColor = Color.FromArgb(0x55, 0xff, 0x7a);
+                        this.BackColor = Color.FromArgb(0xab, 0xff, 0x7d);
                         break;
                     case TileType.End:
-                        this.BackColor = Color.FromArgb(0xff, 0x55, 0x55);
+                        this.BackColor = Color.FromArgb(0xff, 0x90, 0x7d);
                         break;
 
                     case TileType.Path:
-                        this.BackColor = Color.FromArgb(0xff, 0x55, 0xaa);
+                        this.BackColor = Color.FromArgb(0xff, 0x7d, 0xec);
                         break;
 
                     case TileType.Calculated:
-                        this.BackColor = Color.FromArgb(0xFF, 0xda, 0x55);
+                        this.BackColor = Color.FromArgb(0xff, 0xd1, 0x7d);
                         break;
 
                     default:
@@ -46,9 +47,9 @@
 
         public bool Freezed { get; set; } = false;
 
-        public int Id { get; set; }
+        public uint Id { get; set; }
 
-        public Tile(int id, int x, int y, Form1 form) : base()
+        public Tile(uint id, int x, int y, Form1 form) : base()
         {
             this.Id = id;
             this._form = form;
@@ -62,6 +63,33 @@
 
             //set text
             this.Text = $"x:{x} y:{y}";
+        }
+
+        public TileInfosMode InfosMode
+        {
+            get { return _tile_infos_mode; }
+            set
+            {
+                switch (value)
+                {
+                    case TileInfosMode.None:
+                        Text = string.Empty;
+                        break;
+
+                    case TileInfosMode.Position:
+                        Text = $"x:{position.X} y:{position.Y}";
+                        break;
+
+                    case TileInfosMode.Id:
+                        Text = $"{Id}";
+                        break;
+
+                    default:
+                        break;
+                }
+
+                _tile_infos_mode = value;
+            }
         }
 
         private void Init()

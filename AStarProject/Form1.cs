@@ -11,6 +11,12 @@ namespace AStarProject
         Path,
         Calculated
     }
+    public enum TileInfosMode
+    {
+        None,
+        Position,
+        Id
+    }
 
     public partial class Form1 : Form
     {
@@ -23,6 +29,7 @@ namespace AStarProject
 
         private bool _is_calculating = false;
         private int _tile_size = TILE_SIZE;
+        private TileInfosMode _tile_info_mode = TileInfosMode.None;
 
         public int TileSize
         {
@@ -38,7 +45,7 @@ namespace AStarProject
         }
         public Tile? StartTile { get; set; } = null;
         public Tile? EndTile { get; set; } = null;
-        public Dictionary<int, Tile> Tiles { get; set; }
+        public Dictionary<uint, Tile> Tiles { get; set; }
 
         public bool IsCalculating
         {
@@ -60,6 +67,24 @@ namespace AStarProject
             get
             {
                 return StartTile == null ? TileType.Start : TileType.End;
+            }
+        }
+
+        public TileInfosMode TileInfosMode
+        {
+            get
+            {
+                return _tile_info_mode;
+            }
+            set
+            {
+                foreach (var tile in Tiles.Values)
+                {
+                    tile.InfosMode = value;
+                }
+
+                _tile_info_mode = value;
+
             }
         }
 
@@ -96,6 +121,7 @@ namespace AStarProject
             InitEvents();
             CreateGrid(GRID_SIZE_X, GRID_SIZE_Y);
             lbl_op_result.Text = "";
+            dup_tile_infos_mode.SelectedIndex = 0;
         }
 
         private void InitEvents()
@@ -105,12 +131,13 @@ namespace AStarProject
             btn_clear.Click += (object obj, EventArgs args) => Clear();
             this.btn_zoom_in.Click += ZoomIn;
             this.btn_zoom_out.Click += ZoomOut;
+            dup_tile_infos_mode.SelectedItemChanged += (object obj, EventArgs args) => UpdateTileInfosMode();
         }
 
         private void CreateGrid(int sizeX, int sizeY, int tileSize = TILE_SIZE)
         {
-            Tiles = new Dictionary<int, Tile>();
-            int id = 0;
+            Tiles = new Dictionary<uint, Tile>();
+            uint id = 0;
 
             for (int y = 0; y < sizeY; y++)
             {
@@ -132,7 +159,7 @@ namespace AStarProject
 
         private void UpdateGrid(int tileSize = TILE_SIZE)
         {
-            for (int i = 0; i < Tiles.Count; i++)
+            for (uint i = 0; i < Tiles.Count; i++)
             {
                 var t = Tiles[i];
                 t.Location = new Point(t.position.X * tileSize, t.position.Y * tileSize);
@@ -240,6 +267,8 @@ namespace AStarProject
 
         #endregion
 
+        #region Zoom
+
         private void ZoomIn(object sender, EventArgs e)
         {
             TileSize += 20;
@@ -249,5 +278,17 @@ namespace AStarProject
         {
             TileSize -= 20;
         }
+
+        #endregion
+
+        #region TileInfos
+
+        private void UpdateTileInfosMode()
+        {
+            var mode = (TileInfosMode)dup_tile_infos_mode.SelectedIndex;
+            TileInfosMode = mode;
+        }
+
+        #endregion
     }
 }

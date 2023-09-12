@@ -3,16 +3,16 @@ using AStarProject.Controls;
 
 internal readonly struct TileData
 {
-    public readonly int g_cost;
-    public readonly int h_cost;
-    public readonly int f_cost;
-    public readonly int x;
-    public readonly int y;
-    public readonly int id;
-    public readonly int parent_id;
+    public readonly uint g_cost;
+    public readonly uint h_cost;
+    public readonly uint f_cost;
+    public readonly uint x;
+    public readonly uint y;
+    public readonly uint id;
+    public readonly uint parent_id;
     public readonly bool is_wall;
 
-    public TileData(int gCost, int hCost, int fCost, int x, int y, int tileId, int parentId, bool isWall)
+    public TileData(uint gCost, uint hCost, uint fCost, uint x, uint y, uint tileId, uint parentId, bool isWall)
     {
         this.g_cost = gCost;
         this.h_cost = hCost;
@@ -27,10 +27,10 @@ internal readonly struct TileData
 
 public readonly struct AStarOperationResult{
     public readonly bool success;
-    public readonly int[] path;
-    public readonly int[] calculated_tiles;
+    public readonly uint[] path;
+    public readonly uint[] calculated_tiles;
 
-    public AStarOperationResult(bool success, int[] path, int[] calculatedTiles)
+    public AStarOperationResult(bool success, uint[] path, uint[] calculatedTiles)
     {
         this.success = success;
         this.path = path;
@@ -40,13 +40,13 @@ public readonly struct AStarOperationResult{
 
 public class AstarCalculation{
     private bool _hasFounded = false;
-    private Dictionary<int, TileData> _tiles;
-    private int _startTile;
-    private int _endTile;
-    private int _row_size;
-    private int _column_size;
+    private Dictionary<uint, TileData> _tiles;
+    private uint _startTile;
+    private uint _endTile;
+    private uint _row_size;
+    private uint _column_size;
 
-    public AstarCalculation(Dictionary<int, Tile> tiles, Tile startTile, Tile endTile, int rowSize, int columnSize)
+    public AstarCalculation(Dictionary<uint, Tile> tiles, Tile startTile, Tile endTile, uint rowSize, uint columnSize)
     {
         _startTile = startTile.Id;
         _endTile = endTile.Id;
@@ -54,7 +54,7 @@ public class AstarCalculation{
         _column_size = columnSize;
 
         //init tiles data from tiles
-        _tiles = new Dictionary<int, TileData>();
+        _tiles = new Dictionary<uint, TileData>();
         foreach (var t in tiles)
         {
             Tile tile = t.Value;
@@ -63,8 +63,8 @@ public class AstarCalculation{
                 0,
                 0,
                 0,
-                (int)tile.position.X,
-                (int)tile.position.Y,
+                (uint)tile.position.X,
+                (uint)tile.position.Y,
                 tile.Id,
                 0,
                 tile.Type == TileType.Wall
@@ -82,8 +82,8 @@ public class AstarCalculation{
     {
         TileData current_tile;
         var open = new List<TileData>();
-        var closed = new List<int>();
-        var calculated_tiles = new List<int>();
+        var closed = new List<uint>();
+        var calculated_tiles = new List<uint>();
 
         //ajouter la tile de depart dans open
         var old_start_data = _tiles[_startTile];
@@ -97,7 +97,7 @@ public class AstarCalculation{
             if (open.Count == 0)
             {
                 _hasFounded = false;
-                return new AStarOperationResult(false, Array.Empty<int>(), calculated_tiles.ToArray());
+                return new AStarOperationResult(false, Array.Empty<uint>(), calculated_tiles.ToArray());
             }
 
             //trouver la tile avec le plus petit fCost
@@ -133,7 +133,7 @@ public class AstarCalculation{
                     var data = CreateTDataFrom(n.id, current_tile.id, g_cost, CalculateHCost(n.x, n.y), n.x, n.y, false);
 
                     //ajouter la tile dans open
-                    open.Add(n);
+                    open.Add(data);
                     _tiles[n.id] = data;
                     calculated_tiles.Add(n.id);
                 }
@@ -152,7 +152,7 @@ public class AstarCalculation{
         }
 
         //reconstruire le chemin
-        var path = new List<int>();
+        var path = new List<uint>();
         var current_path_tile_data = _tiles[_endTile];
 
         while (current_path_tile_data.id != _startTile)
@@ -166,48 +166,48 @@ public class AstarCalculation{
         return new AStarOperationResult(true, path.ToArray(), calculated_tiles.ToArray());
     }
 
-    private int CalculateHCost(int x, int y)
+    private uint CalculateHCost(uint x, uint y)
     {
         var x_pos = Math.Abs((int)x - (int)_tiles[_endTile].x);
         var y_pos = Math.Abs((int)y - (int)_tiles[_endTile].y);
 
         int res = (int)Math.Ceiling(Math.Sqrt(x_pos*x_pos + y_pos*y_pos) * 10);
-        return (int)res;
+        return (uint)res;
     }
-    private int CalculateGCost(int x, int y, int parentX, int parentY, int parentGCost)
+    private uint CalculateGCost(uint x, uint y, uint parentX, uint parentY, uint parentGCost)
     {
         //si la tile est sur la meme ligne ou colonne que la tile parente, on ajoute 10 au gCost, sinon on ajoute 14
         var to_add = x == parentX || y == parentY ? 10 : 14;
-        return (int)(parentGCost + to_add);
+        return (uint)(parentGCost + to_add);
     }
-    private int CalculateFCost(int gCost, int hCost)
+    private uint CalculateFCost(uint gCost, uint hCost)
     {
         return gCost + hCost;
     }
 
-    private int[] FindNeighbourOf(int id, int x, int y)
+    private uint[] FindNeighbourOf(uint id, uint x, uint y)
     {
-        var result = new List<int>(8);
+        var result = new List<uint>(8);
 
         if (x != 0) result.Add(id - 1);
         
         if (x != _row_size - 1) result.Add(id + 1);
 
-        if (y != 0) result.Add((int)(id - _row_size));
+        if (y != 0) result.Add((uint)(id - _row_size));
 
-        if (y != _column_size - 1) result.Add((int)(id + _row_size));
+        if (y != _column_size - 1) result.Add((uint)(id + _row_size));
 
-        if (x != 0 && y != 0) result.Add((int)(id - _row_size - 1));
+        if (x != 0 && y != 0) result.Add((uint)(id - _row_size - 1));
 
-        if (x != _row_size - 1 && y != 0) result.Add((int)(id - _row_size + 1));
+        if (x != _row_size - 1 && y != 0) result.Add((uint)(id - _row_size + 1));
 
-        if (x != 0 && y != _column_size - 1) result.Add((int)(id + _row_size - 1));
+        if (x != 0 && y != _column_size - 1) result.Add((uint)(id + _row_size - 1));
 
-        if (x != _row_size - 1 && y != _column_size - 1) result.Add((int)(id + _row_size + 1));
+        if (x != _row_size - 1 && y != _column_size - 1) result.Add((uint)(id + _row_size + 1));
 
         return result.ToArray();
 
-
+        //avant refactorisation:
         // var neighbours = new List<Tile>(8);
         // var tilePosition = tile.position;
         // var neighbours_tiles = from t in tiles
@@ -218,7 +218,7 @@ public class AstarCalculation{
         // return neighbours_tiles.ToArray();
     }
 
-    private TileData CreateStartData(int id, int x, int y)
+    private TileData CreateStartData(uint id, uint x, uint y)
     {
         var h_cost = CalculateHCost(x, y);
 
@@ -241,7 +241,7 @@ public class AstarCalculation{
         var lowestHCost = lowest_f_cost_tiles.Min(t => t.h_cost);
         return lowest_f_cost_tiles.First(t => t.h_cost == lowestHCost);
     }
-    private TileData CreateTDataFrom(int tileId, int parentId, int gCost, int hCost, int x, int y, bool isWall)
+    private TileData CreateTDataFrom(uint tileId, uint parentId, uint gCost, uint hCost, uint x, uint y, bool isWall)
     {
         return new TileData(
             gCost,

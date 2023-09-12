@@ -31,3 +31,4 @@ G:\A_star_project\AStarProject\obj\Debug\net6.0-windows\refint\AStarProject.dll
 G:\A_star_project\AStarProject\obj\Debug\net6.0-windows\AStarProject.pdb
 G:\A_star_project\AStarProject\obj\Debug\net6.0-windows\AStarProject.genruntimeconfig.cache
 G:\A_star_project\AStarProject\obj\Debug\net6.0-windows\ref\AStarProject.dll
+G:\A_star_project\AStarProject\obj\Debug\net6.0-windows\AStarProject.csproj.AssemblyReference.cache

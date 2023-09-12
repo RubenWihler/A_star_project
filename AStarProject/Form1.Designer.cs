@@ -30,6 +30,7 @@
         {
             tiles_container = new Panel();
             navigation = new Panel();
+            dup_tile_infos_mode = new DomainUpDown();
             grpbox_opresult = new GroupBox();
             lbl_op_result = new Label();
             btn_clear = new Button();
@@ -53,6 +54,7 @@
             // navigation
             // 
             navigation.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            navigation.Controls.Add(dup_tile_infos_mode);
             navigation.Controls.Add(grpbox_opresult);
             navigation.Controls.Add(btn_clear);
             navigation.Controls.Add(btn_zoom_in);
@@ -63,6 +65,18 @@
             navigation.Name = "navigation";
             navigation.Size = new Size(1055, 82);
             navigation.TabIndex = 1;
+            // 
+            // dup_tile_infos_mode
+            // 
+            dup_tile_infos_mode.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            dup_tile_infos_mode.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            dup_tile_infos_mode.Items.Add("none");
+            dup_tile_infos_mode.Items.Add("position");
+            dup_tile_infos_mode.Items.Add("id");
+            dup_tile_infos_mode.Location = new Point(535, 33);
+            dup_tile_infos_mode.Name = "dup_tile_infos_mode";
+            dup_tile_infos_mode.Size = new Size(145, 25);
+            dup_tile_infos_mode.TabIndex = 0;
             // 
             // grpbox_opresult
             // 
@@ -157,5 +171,6 @@
         private Button btn_clear;
         private GroupBox grpbox_opresult;
         private Label lbl_op_result;
+        private DomainUpDown dup_tile_infos_mode;
     }
 }

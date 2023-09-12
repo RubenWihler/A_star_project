@@ -131,7 +131,12 @@
                 return true;
             }
 
-            if (oldType == TileType.End && (type == TileType.Calculated || type == TileType.Path)) return false;
+            if (oldType == TileType.Calculated && type == TileType.Path)
+            {
+                Type = type;
+                return true;
+            }
+
 
             return false;
         }

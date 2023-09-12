@@ -14,7 +14,7 @@ namespace AStarProject
 
     public partial class Form1 : Form
     {
-        const int GRID_SIZE_X = 20;
+        const int GRID_SIZE_X = 30;
         const int GRID_SIZE_Y = 20;
         const int TILE_SIZE = 85;
 
@@ -39,6 +39,18 @@ namespace AStarProject
         public Tile? StartTile { get; set; } = null;
         public Tile? EndTile { get; set; } = null;
         public Dictionary<int, Tile> Tiles { get; set; }
+
+        public bool IsCalculating
+        {
+            get { return _is_calculating; }
+            set
+            {
+                _is_calculating = value;
+                btn_clear.Enabled = _is_calculating;
+                btn_start.Enabled = _is_calculating;
+                btn_reset.Enabled = _is_calculating;
+            }
+        }
 
         /// <summary>
         /// Get the special interaction type (right click on tile)
@@ -83,12 +95,14 @@ namespace AStarProject
         {
             InitEvents();
             CreateGrid(GRID_SIZE_X, GRID_SIZE_Y);
+            lbl_op_result.Text = "";
         }
 
         private void InitEvents()
         {
             this.btn_start.Click += (object obj, EventArgs args) => Start();
-            this.btn_reset.Click += (object obj, EventArgs args) => Clear();
+            this.btn_reset.Click += (object obj, EventArgs args) => Reset();
+            btn_clear.Click += (object obj, EventArgs args) => Clear();
             this.btn_zoom_in.Click += ZoomIn;
             this.btn_zoom_out.Click += ZoomOut;
         }
@@ -131,10 +145,25 @@ namespace AStarProject
         #region Clear
 
         /// <summary>
-        /// Clear all tiles and reset the start and end tiles
+        /// Remove all calculated tile and path
         /// </summary>
         public void Clear()
         {
+            foreach (Tile t in Tiles.Values)
+            {
+                if (t.Type == TileType.Calculated || t.Type == TileType.Path)
+                {
+                    t.Type = TileType.Empty;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Clear all tiles and reset the start and end tiles
+        /// </summary>
+        public void Reset()
+        {
+            if (_is_calculating) return;
             StartTile = null;
             EndTile = null;
             ClearTiles();
@@ -149,6 +178,8 @@ namespace AStarProject
                 tile.Reset();
             });
         }
+
+
 
         #endregion
 
@@ -172,22 +203,38 @@ namespace AStarProject
 
             _is_calculating = true;
 
-            var operation = new AstarCalculation(Tiles, StartTile, EndTile);
+            var time = DateTime.Now;
+
+            var operation = new AstarCalculation(Tiles, StartTile, EndTile, GRID_SIZE_X, GRID_SIZE_Y);
             var result = await operation.CalculateAsync();
+
+            var calculation_time = DateTime.Now - time;
 
             _is_calculating = false;
 
             if (!result.success)
             {
-                MessageBox.Show("The path is imposible.", "No path found !", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("The path is impossible !", "No path found !", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                lbl_op_result.Text = "operation failed !";
                 return;
             }
 
-            var path = result.path;
+            var calculation_time_in_ms = calculation_time.TotalMilliseconds;
+            lbl_op_result.Text = $"operation success in {calculation_time_in_ms}ms";
+
+            var path = result.path.Select((id) => Tiles[id]);
+            var calculed_tiles = result.calculated_tiles.Select((id) => Tiles[id]);
+
+            foreach (var tile in calculed_tiles)
+            {
+                if (tile.Type == TileType.End) continue;
+                tile.SetType(TileType.Calculated);
+            }
 
             foreach (var tile in path)
             {
-                tile.Type = TileType.Path;
+                if (tile.Type == TileType.End) continue;
+                tile.SetType(TileType.Path);
             }
         }
 

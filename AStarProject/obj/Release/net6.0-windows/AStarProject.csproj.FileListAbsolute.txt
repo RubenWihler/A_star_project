@@ -3,7 +3,6 @@ G:\A_star_project\AStarProject\bin\Release\net6.0-windows\AStarProject.deps.json
 G:\A_star_project\AStarProject\bin\Release\net6.0-windows\AStarProject.runtimeconfig.json
 G:\A_star_project\AStarProject\bin\Release\net6.0-windows\AStarProject.dll
 G:\A_star_project\AStarProject\bin\Release\net6.0-windows\AStarProject.pdb
-G:\A_star_project\AStarProject\obj\Release\net6.0-windows\AStarProject.csproj.AssemblyReference.cache
 G:\A_star_project\AStarProject\obj\Release\net6.0-windows\AStarProject.Form1.resources
 G:\A_star_project\AStarProject\obj\Release\net6.0-windows\AStarProject.csproj.GenerateResource.cache
 G:\A_star_project\AStarProject\obj\Release\net6.0-windows\AStarProject.GeneratedMSBuildEditorConfig.editorconfig

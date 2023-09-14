@@ -236,10 +236,29 @@ public class AstarCalculation{
     private TileData FindLowestFCostTileData(List<TileData> tileDatas)
     {
         var lowestFCost = tileDatas.Min(t => t.f_cost);
-        var lowest_f_cost_tiles = tileDatas.Where(t => t.f_cost == lowestFCost).ToArray();
+        var lowest_f_cost_tiles = tileDatas.Where(t => t.f_cost == lowestFCost);
 
         var lowestHCost = lowest_f_cost_tiles.Min(t => t.h_cost);
         return lowest_f_cost_tiles.First(t => t.h_cost == lowestHCost);
+
+        // apres plusieurs test:
+        // demande moins de memoire mais met plus de temps a trouver.
+        // donc on a decider de garder la premiere.
+        //
+        //TileData result = tileDatas[0];
+        //uint lowest_f_cost = result.f_cost;
+        //uint lowest_h_cost = result.h_cost;
+
+        //foreach (var t in tileDatas)
+        //{
+        //    if (t.f_cost > lowest_f_cost) continue;
+        //    if (t.h_cost > lowest_h_cost) continue;
+        //    lowest_f_cost = t.f_cost;
+        //    lowest_h_cost = t.h_cost;
+        //    result = t;
+        //}
+
+        //return result;
     }
     private TileData CreateTDataFrom(uint tileId, uint parentId, uint gCost, uint hCost, uint x, uint y, bool isWall)
     {
